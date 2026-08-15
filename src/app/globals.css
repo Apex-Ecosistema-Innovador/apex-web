@@ -1,0 +1,156 @@
+@import "tailwindcss";
+
+:root {
+  /* Paleta oficial de marca — jerarquía definida por el equipo de diseño.
+     Ver .claude/skills/apex-design-system/SKILL.md, sección 1. */
+  --brand-green-pine: #00842d;
+  --brand-green-light: #96ff27;
+  --brand-yellow: #ede200;
+  --brand-charcoal: #3a3a3a;
+  --brand-purple: #8709d8;
+  --brand-purple-accessible: #c9a6ff;
+
+  /* Fondo base (derivado) */
+  --bg-base: #08090a;
+  --bg-surface: #101210;
+  --bg-elevated: #3a3a3a;
+  --bg-principal-fill: #00842d;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-default: rgba(255, 255, 255, 0.16);
+  --border-principal: rgba(0, 132, 45, 0.5);
+
+  /* Texto */
+  --text-primary: #f4f6f1;
+  --text-secondary: rgba(244, 246, 241, 0.65);
+  --text-muted: rgba(244, 246, 241, 0.42);
+  --text-accent: var(--brand-green-light);
+  --text-accent-alt: var(--brand-yellow);
+
+  /* Radios — Tailwind ya cubre estos valores con rounded-lg (8px) y
+     rounded-xl (12px); se referencian aquí solo como convención documentada. */
+  --radius-default: 0.5rem;
+  --radius-max: 0.75rem;
+
+  /* Animación. Tailwind v4 no tiene un namespace temático para duración
+     (--duration-* no genera utilidades duration-*, a diferencia de --ease-*),
+     así que estas se consumen con la sintaxis de valor arbitrario:
+     duration-(--duration-fast). */
+  --duration-fast: 150ms;
+  --duration-base: 300ms;
+  --duration-slow: 600ms;
+}
+
+@theme inline {
+  --font-display: var(--font-chakra-petch);
+  --font-body: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* Colores de marca, expuestos como bg-brand-, text-brand- y border-brand- */
+  --color-brand-green-pine: var(--brand-green-pine);
+  --color-brand-green-light: var(--brand-green-light);
+  --color-brand-yellow: var(--brand-yellow);
+  --color-brand-charcoal: var(--brand-charcoal);
+  --color-brand-purple: var(--brand-purple);
+  --color-brand-purple-accessible: var(--brand-purple-accessible);
+
+  /* Superficies, expuestas como bg-canvas / bg-surface / bg-elevated / bg-principal-fill.
+     Nota: el token NO se llama "base" a propósito — colisiona con el font-size nativo
+     text-base (1rem) de Tailwind y gana la resolución de color, dejando `text-base` sin
+     tamaño de fuente en todo el sitio. Detectado con Playwright; no reintroducir ese nombre. */
+  --color-canvas: var(--bg-base);
+  --color-surface: var(--bg-surface);
+  --color-elevated: var(--bg-elevated);
+  --color-principal-fill: var(--bg-principal-fill);
+
+  /* Bordes, expuestos como border-subtle / border-default / border-principal */
+  --color-subtle: var(--border-subtle);
+  --color-default: var(--border-default);
+  --color-principal: var(--border-principal);
+
+  /* Texto, expuesto como text-primary / text-secondary / text-muted / text-accent / text-accent-alt */
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-muted: var(--text-muted);
+  --color-accent: var(--text-accent);
+  --color-accent-alt: var(--text-accent-alt);
+
+  /* Easing, expuesto como ease-default */
+  --ease-default: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* El Navbar es fixed (transparente sobre el Hero, sólido al hacer scroll),
+   así que reservamos espacio al saltar por ancla para que no tape el título
+   de la sección destino. --navbar-height la fija Navbar.tsx vía ResizeObserver
+   (cambia entre desktop y el navbar envuelto en varias líneas en móvil); 5rem
+   es el valor de respaldo antes de que ese efecto corra. scroll-behavior:
+   smooth vive aquí (no en JS) para que sea la propia navegación nativa por
+   ancla la que anime — más robusto entre navegadores y no rompe el
+   comportamiento nativo de los enlaces ni la navegación por teclado. */
+html {
+  scroll-padding-top: var(--navbar-height, 5rem);
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Flotar muy discreto para la pista "explora las zonas" de FutureLab — corre
+   solo hasta la primera interacción del usuario con el blueprint, nunca en
+   loop indefinido. Ver LabBlueprint.tsx / FutureLab.tsx. */
+@keyframes lab-hint-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Respiración del degradado de FinalCTA — movimiento continuo, muy lento y
+   casi imperceptible sobre las manchas de fondo, para que la única sección
+   clara del sitio se sienta viva sin distraer. Cada mancha usa esta misma
+   keyframe con su propia duración/delay (ver FinalCTA.tsx) para que no
+   respiren en sincronía. */
+@keyframes cta-breathe {
+  0%,
+  100% {
+    transform: scale(1) translate(0, 0);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.06) translate(2%, -2%);
+    opacity: 1;
+  }
+}
+
+/* Acento de llegada del nodo CÓDIGO en el NodeGraph del Hero — un solo
+   destello (animation-iteration-count implícito en "1", nunca infinite) que
+   confirma que el recorrido problema→código llegó a su destino. */
+@keyframes nodegraph-code-pulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1.85);
+    opacity: 0;
+  }
+}
+
+/* Bob vertical muy sutil del indicador de scroll del Hero — la única
+   excepción de motion en loop del sitio para este elemento puntual, pedida
+   explícitamente; se desvanece por completo apenas el usuario hace scroll
+   (ver Hero.tsx). */
+@keyframes hero-scroll-hint {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}

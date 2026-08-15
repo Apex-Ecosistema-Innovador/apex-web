@@ -1,36 +1,161 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# APEX
 
-## Getting Started
+Sitio web del proyecto de investigación universitario **APEX** (nombre de marca).
 
-First, run the development server:
+Proyecto formal: *"Modelo metodológico para el fortalecimiento en el desempeño
+académico en programación y desarrollo de lógica en APIT"*.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Stack
+
+- [Next.js](https://nextjs.org) (App Router) — nota: esta instalación puede tener
+  cambios respecto a versiones anteriores; ver `AGENTS.md` y
+  `node_modules/next/dist/docs/` antes de tocar convenciones de rutas/archivos.
+- TypeScript
+- Tailwind CSS v4 (tokens vía `@theme` en `globals.css`, no `tailwind.config.js`)
+- `clsx` + `tailwind-merge` (helper `cn` en `src/lib/cn.ts`)
+- `next/font/google`: Chakra Petch (display), Inter (body), JetBrains Mono (mono)
+
+## Sistema de diseño
+
+El sistema de diseño oficial vive en
+[`.claude/skills/apex-design-system/SKILL.md`](.claude/skills/apex-design-system/SKILL.md)
+— consultarlo siempre antes de tocar estilos, colores, tipografía, espaciado,
+animaciones o `components/ui`, `components/sections`, `components/visuals` o
+`globals.css`. Resumen de lo ya implementado (solo en `layout.tsx`, `globals.css`
+y `components/ui|layout/`; **`components/sections/` todavía no tiene el
+rediseño aplicado**, sigue con estilos neutros de la fase anterior):
+
+- **Color** (`src/app/globals.css`): paleta de marca completa (`--brand-green-pine`,
+  `--brand-green-light`, `--brand-yellow`, `--brand-charcoal`, `--brand-purple`)
+  + fondo base oscuro derivado (`--bg-base`, `--bg-surface`, `--bg-elevated`,
+  `--bg-principal-fill`) + tokens de texto y borde, expuestos a Tailwind vía
+  `@theme inline` como clases `bg-base`, `text-accent`, `border-subtle`, etc.
+- **Tipografía**: `font-display` (Chakra Petch, h1/h2), `font-body` (Inter,
+  párrafos/UI) y `font-mono` (JetBrains Mono, etiquetas tipo "FASE 1"/"01").
+- **Animación**: `--ease-default` (registrado en `@theme`, genera la clase
+  `ease-default`) y `--duration-fast/base/slow` — **importante**: Tailwind v4
+  no tiene namespace temático para duración (a diferencia de `--ease-*`), así
+  que estas se consumen con la sintaxis de valor arbitrario
+  `duration-(--duration-fast)`, no como clase `duration-fast` directa.
+- **Radios**: sin tokens custom — se usa `rounded-lg`/`rounded-xl` nativos de
+  Tailwind, que ya coinciden con los valores de la skill (8px/12px).
+- `Reveal` ya anima de verdad (`opacity-0 translate-y-4` → `opacity-100
+  translate-y-0`, solo `transform`/`opacity`), usando `useInView`
+  (IntersectionObserver real, ya no un stub) y respetando
+  `useReducedMotion` (media query real, ya no un stub).
+
+## Estructura
+
+```
+src/
+  app/            App Router (page.tsx, layout.tsx, globals.css)
+  components/
+    layout/       Navbar, Footer, Container (wrapper de ancho máximo)
+    sections/     Una sección por bloque narrativo de la landing
+    ui/           Piezas reutilizables (Button, Badge, PhaseTag, SectionHeading, Reveal)
+    visuals/      Diagramas/visualizaciones (NodeGraph, PipelineFlow, CodePathDiagram)
+  content/        Datos tipados que alimentan las secciones
+  lib/            Utilidades (cn.ts)
+  hooks/          useReducedMotion, useInView
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`src/app/` fue movido desde `app/` en la raíz para mantener todo el código de la
+aplicación bajo `src/`; el alias `@/*` en `tsconfig.json` apunta a `src/*`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Estado actual
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Fase: sistema de diseño base implementado en `ui/`, secciones aún sin
+rediseñar.** `layout.tsx`, `globals.css` y los componentes de `components/ui/`
+y `components/layout/` (Navbar, Footer) ya usan la paleta oscura, tipografía y
+tokens de animación reales de la skill `apex-design-system`. Las 12 secciones
+de `components/sections/` siguen consumiendo sus datos de `src/content/` vía
+`.map()`, pero **todavía con los estilos neutros de la fase anterior** (grises
+por defecto de Tailwind) — aplicarles el sistema de diseño es el siguiente paso.
 
-## Learn More
+Los archivos de `src/content/` tienen la data real del proyecto (tipo + array):
 
-To learn more about Next.js, take a look at the following resources:
+| Archivo             | Contenido                                                         |
+| -------------------- | ------------------------------------------------------------------ |
+| `problems.ts`         | 4 problemas que motivan el proyecto                                |
+| `pillars.ts`          | 3 pilares del modelo: REFUERZA, COMPITE, AVANZA                    |
+| `journey.ts`          | 7 pasos del recorrido del estudiante                                |
+| `methodology.ts`      | 4 instrumentos de la metodología (documental, entrevista, rúbrica de expertos, grupo focal) |
+| `roadmap.ts`          | 6 fases del proyecto (sin fechas), marcadas como `actual`/`futuro` |
+| `impact.ts`           | 4 enunciados de impacto esperado (en condicional/prospectivo)      |
+| `team.ts`             | Equipo de investigación y estudiantes investigadores               |
+| `stats.ts`            | Las 3 únicas cifras permitidas, cada una con su fuente citada       |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Reglas de contenido (importante, respetar en todo el copy futuro)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- El proyecto está en **Fase 1: diagnóstico, diseño y validación** — no se ha
+  implementado ni hay una prueba piloto. La metodología es cualitativa
+  (análisis documental, entrevistas, validación por juicio de expertos y
+  grupo focal), sin experimentación con estudiantes en esta fase.
+- Nunca usar cifras/resultados como si ya hubieran ocurrido, ni verbos de
+  impacto en pasado ("logramos", "mejoramos"). Usar siempre condicional o
+  prospectivo ("busca", "pretende", "está orientado a", "se espera").
+- Las únicas cifras permitidas en todo el sitio son las 3 de `stats.ts`, y
+  siempre deben mostrarse junto con su fuente.
 
-## Deploy on Vercel
+Orden narrativo de las secciones en `src/app/page.tsx`, con el `id` real de cada
+`<section>` (en español, para que coincidan con los anclas del Navbar y los
+botones del Hero):
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Navbar
+2. Hero — `#hero`
+3. Problem — `#problema`
+4. ParadigmShift — `#cambio-de-paradigma`
+5. Pillars — `#modelo`
+6. LearningJourney — `#recorrido`
+7. AISection — `#ia`
+8. CompetitivePath — `#camino-competitivo`
+9. FutureLab — `#vision`
+10. Research — `#investigacion`
+11. Impact — `#impacto`
+12. Team — `#equipo`
+13. FinalCTA — `#cierre`
+14. Footer
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+El Navbar enlaza a Problema, Modelo, Investigación, Visión y Equipo; los dos
+botones del Hero apuntan a `#problema` y `#modelo`.
+
+### Componentes `ui/` ya implementados (con el sistema de diseño aplicado)
+
+- `Button` — variantes `primary` (fondo `--brand-green-light`, texto oscuro)
+  y `secondary` (borde `--border-default`, hover `--border-principal`);
+  renderiza `<a>` si recibe `href`, o `<button>` si no. `rounded-lg`, sin
+  `rounded-full` ni gradientes.
+- `Badge` — fondo `--bg-elevated`, borde `--border-subtle`, texto `font-mono`
+  pequeño, `rounded-lg` (no pill). Acepta `className` para que otros
+  componentes (como `PhaseTag`) lo extiendan.
+- `PhaseTag` — `Badge` con indicador `●`/`○`; `status="actual"` usa acento
+  `--brand-green-light` (`border-principal text-accent`), `status="futuro"`
+  se ve apagado (`text-muted`, sin acento).
+- `SectionHeading` — `eyebrow` en `font-mono uppercase tracking-widest
+  text-accent`, `title` en `font-display` (jerarquía H2 de la skill),
+  `description` en `font-body text-secondary`. Alineado a la izquierda.
+- `Reveal` — scroll-reveal real (ver sección de animación arriba).
+
+## Próximos pasos (pendientes)
+
+- Aplicar el sistema de diseño a `components/sections/` (hoy usan grises
+  neutros de la fase anterior, no los tokens de marca).
+- Reescribir el copy final de cada sección (Hero, AISection, CompetitivePath y
+  FutureLab tienen copy corto de placeholder pensado para reescritura).
+- Envolver bloques de sección con `Reveal` para activar el scroll-reveal.
+- Implementar las visualizaciones (`NodeGraph`, `PipelineFlow`, `CodePathDiagram`)
+  para reemplazar las listas de texto plano de `ParadigmShift`, `LearningJourney`
+  y `CompetitivePath`.
+- Sticky nav / scroll spy en el Navbar (hoy son solo `<a href="#...">` planos).
+- Conseguir el asset del logo con fondo transparente (`/public/brand/logo.svg`)
+  y crear el componente `<Logo />` — hoy el Navbar usa texto "APEX" en su lugar.
+
+## Desarrollo
+
+```bash
+npm run dev     # servidor de desarrollo
+npm run build   # build de producción
+npm run lint    # eslint
+```
+
+Abrir [http://localhost:3000](http://localhost:3000).
