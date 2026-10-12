@@ -152,10 +152,44 @@ botones del Hero apuntan a `#problema` y `#modelo`.
 
 ## Desarrollo
 
+El gestor de paquetes es **pnpm** (versión fijada en `packageManager`; con Corepack, `corepack enable` la instala sola). Requiere Node 24.
+
 ```bash
-npm run dev     # servidor de desarrollo
-npm run build   # build de producción
-npm run lint    # eslint
+pnpm install
+pnpm dev         # servidor de desarrollo
+pnpm build       # build de producción
+pnpm lint        # eslint
+pnpm typecheck   # tsc --noEmit
+pnpm test        # vitest
 ```
 
-Abrir [http://localhost:3000](http://localhost:3000).
+Abrir [http://localhost:3000](http://localhost:3000). Si ese puerto lo usa otro proyecto: `pnpm dev -p 3002` (el API espera `http://localhost:3002` por defecto en `APEX_WEB_BASE_URL`).
+
+Los scripts de compilación de dependencias se aprueban en `pnpm-workspace.yaml` (`allowBuilds`).
+
+## Inscripción a la hackathon
+
+Rutas bajo `/hackathon`:
+
+| Ruta | Qué hace |
+| ---- | -------- |
+| `/hackathon/inscripcion` | Formulario de registro (cuenta + perfil + contexto + reglamento y consentimientos). Muestra un aviso si las inscripciones están cerradas. |
+| `/hackathon/verificar-correo` | Recibe el enlace del correo (`#token=…`), verifica la cuenta y permite pedir un enlace nuevo. |
+| `/hackathon/reglamento` | Reglamento vigente del evento (versionado). |
+| `/hackathon/autorizacion-datos` | Autorización de tratamiento de datos (versionada). |
+
+Los datos viven en `apex-api`. Configuración en `.env.local` (ver `.env.example`):
+
+```
+NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
+NEXT_PUBLIC_EVENTO_ID=<id que imprime `pnpm seed:hackathon` en apex-api>
+```
+
+`NEXT_PUBLIC_API_URL` también alimenta `connect-src` del CSP (`src/proxy.ts`): el navegador solo puede llamar a ese origen.
+
+Notas de implementación:
+
+- Formulario con `react-hook-form` + Zod (`src/lib/hackathon/esquema.ts`). Las reglas están duplicadas en el API (`apex-api`), que siempre vuelve a validar. Zod corre en modo `jitless` para no disparar violaciones de CSP por `eval`.
+- El texto del reglamento y de la autorización de datos (`src/content/hackathon/`) es **provisional**: lo deben revisar el comité y la oficina jurídica. Para publicar una nueva versión se agrega la clave en el mapa y se actualiza la versión en el API.
+- Accesibilidad: cada control tiene `label` asociado, errores con `role="alert"` y `aria-describedby`, todo operable con teclado y texto con contraste mínimo 4,5:1 (por eso las ayudas usan `text-secondary` y no `text-muted`).
+- Las páginas usan `await connection()` para que el CSP con nonce se aplique, igual que la home.

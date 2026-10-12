@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { origenApi } from "@/lib/hackathon/api";
 
 const buildContentSecurityPolicy = (nonce: string) => {
   const directives = [
@@ -9,7 +10,7 @@ const buildContentSecurityPolicy = (nonce: string) => {
     "frame-ancestors 'none'",
     "img-src 'self' data:",
     "font-src 'self'",
-    "connect-src 'self'",
+    `connect-src 'self' ${origenApi()}`,
     "media-src 'self'",
     "worker-src 'self'",
     "child-src 'none'",

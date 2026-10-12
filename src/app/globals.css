@@ -25,6 +25,7 @@
   --text-muted: rgba(244, 246, 241, 0.42);
   --text-accent: var(--brand-green-light);
   --text-accent-alt: var(--brand-yellow);
+  --text-danger: #ff8a7a;
 
   /* Radios — Tailwind ya cubre estos valores con rounded-lg (8px) y
      rounded-xl (12px); se referencian aquí solo como convención documentada. */
@@ -73,6 +74,7 @@
   --color-muted: var(--text-muted);
   --color-accent: var(--text-accent);
   --color-accent-alt: var(--text-accent-alt);
+  --color-danger: var(--text-danger);
 
   /* Easing, expuesto como ease-default */
   --ease-default: cubic-bezier(0.22, 1, 0.36, 1);

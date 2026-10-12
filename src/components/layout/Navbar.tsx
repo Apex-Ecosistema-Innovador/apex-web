@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Container } from "@/components/layout/Container";
+import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import { useScrolled } from "@/hooks/useScrolled";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -137,7 +138,7 @@ export function Navbar() {
       >
         <Container>
           <nav className="flex flex-wrap items-center justify-between gap-4 py-4">
-            <a href="#quienes-somos" className="flex items-center gap-2">
+            <a href="#quienes-somos" className="order-1 flex items-center gap-2">
               <Image
                 src="/brand/logo.png"
                 alt=""
@@ -153,7 +154,7 @@ export function Navbar() {
                 className="h-7 w-auto object-contain"
               />
             </a>
-            <ul className="flex flex-wrap gap-6 font-body text-sm text-secondary">
+            <ul className="order-3 flex w-full flex-wrap gap-x-6 gap-y-1 font-body text-sm text-secondary lg:order-2 lg:w-auto">
               {links.map((link) => {
                 const id = link.href.slice(1);
                 const isActive = activeId === id;
@@ -186,6 +187,9 @@ export function Navbar() {
                 );
               })}
             </ul>
+            <Button href="/hackathon/inscripcion" variant="secondary" className="order-2 lg:order-3">
+              Hackathon
+            </Button>
           </nav>
         </Container>
       </header>
