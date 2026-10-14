@@ -34,7 +34,11 @@ export function ReenviarVerificacion({
       <Button variant="secondary" onClick={reenviar} disabled={deshabilitado || estado.tipo === "enviando"} className="w-full md:w-auto">
         {estado.tipo === "enviando" ? "Enviando…" : etiqueta}
       </Button>
-      {estado.tipo === "listo" ? <Aviso tono="exito">{estado.mensaje}</Aviso> : null}
+      {estado.tipo === "listo" ? (
+        <Aviso tono="exito">
+          {estado.mensaje} Si no aparece en tu bandeja de entrada, revisa la carpeta de spam o correo no deseado.
+        </Aviso>
+      ) : null}
       {estado.tipo === "error" ? <Aviso tono="error">{estado.mensaje}</Aviso> : null}
     </div>
   );

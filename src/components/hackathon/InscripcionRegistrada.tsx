@@ -28,8 +28,9 @@ export function InscripcionRegistrada({ correo }: InscripcionRegistradaProps) {
           Recibimos tu inscripción
         </h2>
         <p className="font-body text-secondary md:text-lg">
-          Te enviamos un correo a <span className="font-medium text-primary">{correo}</span>. Si no lo ves, revisa la
-          carpeta de spam.
+          Te enviamos un correo a <span className="font-medium text-primary">{correo}</span> desde{" "}
+          <span className="font-medium text-primary">apex.ecosistema.noreply@gmail.com</span>. Si no lo ves en tu bandeja
+          de entrada, busca en la carpeta de spam o correo no deseado.
         </p>
       </div>
       <ol className="flex flex-col gap-3 font-body text-base">
